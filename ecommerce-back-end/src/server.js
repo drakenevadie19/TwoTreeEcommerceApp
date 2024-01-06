@@ -2,26 +2,37 @@ import express from 'express';
 
 import { cartItems as cartItemsRaw, products as productsRaw, } from './temp-data';
 
+import { MongoClient } from 'mongodb';
+
 let cartItem = cartItemsRaw;
 let productItem = productsRaw;
 
+const client = new MongoClient(url);
 
 const app = express();
 
 // Function to convert all ids of items to products 
 //  => if we assign this function to a variable, we can get an array/list of products
-function populatedCartIds(ids) {
+async function populatedCartIds(ids) {
     return ids.map(id => productItem.find(product => product.id === id));
 }
 
 // Loading list of products
-app.get('/products', (req, res) => {
-    res.json(productItem);
+app.get('/products', async (req, res) => {
+    // Connect to the client 
+    await client.connect();
+    const db = client.db('ecomnerce-app');
+    const products = await db.collection('products').find({}).toArray();
+    res.send(products);
 })
 
 // Loading user's current shopping cart
-app.get('/cart', (req, res) => {
-    // Use map function to map id to corresponding product
+app.get('/users/:userId/cart', async (req, res) => {
+    await client.connect();
+    const db = client.db('ecomnerce-app');
+
+    // Get the users from db
+    const user = await db.collection('users').findOne({ id: req.params.userId });
     const populatedCart = populatedCartIds(cartItem);
     res.json(populatedCart);
 })
