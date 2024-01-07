@@ -7,14 +7,20 @@ import { MongoClient } from 'mongodb';
 let cartItem = cartItemsRaw;
 let productItem = productsRaw;
 
+const url = `mongodb+srv://thanhnguyen14gers:Ec9gdaFqjGaZWcvF@cluster0.nve8zrs.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(url);
 
 const app = express();
 
+app.use(express.json());
+
 // Function to convert all ids of items to products 
 //  => if we assign this function to a variable, we can get an array/list of products
 async function populatedCartIds(ids) {
-    return ids.map(id => productItem.find(product => product.id === id));
+    await client.connect();
+    const db = client.db('ecomnerce-app');
+
+    return Promise.all(ids.map(id => db.collection('products').findOne({ id })));
 }
 
 // Loading list of products
@@ -33,7 +39,7 @@ app.get('/users/:userId/cart', async (req, res) => {
 
     // Get the users from db
     const user = await db.collection('users').findOne({ id: req.params.userId });
-    const populatedCart = populatedCartIds(cartItem);
+    const populatedCart = await populatedCartIds(user.cartItems);
     res.json(populatedCart);
 })
 
@@ -49,9 +55,6 @@ app.get('/products/:productId', (req, res) => {
         console.log('product with id=' + productId + ' not found');
     }
 })
-
-app.use(express.json());
-
 // Add an item to shopping cart
 app.post('/cart', (req, res) => {
     // In this POST request, we have add item's id to request body => We can get that id 
