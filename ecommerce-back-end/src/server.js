@@ -4,8 +4,7 @@ import { cartItems as cartItemsRaw, products as productsRaw, } from './temp-data
 
 import { MongoClient } from 'mongodb';
 
-let cartItem = cartItemsRaw;
-let productItem = productsRaw;
+import path from 'path';
 
 async function startTheServer() {
     const client = new MongoClient(url);
@@ -18,6 +17,9 @@ async function startTheServer() {
 
     const app = express();
     app.use(express.json());
+
+    //Server will serve static files from Assests folder
+    app.use('/images', express.static(path.join(__dirname, '../assets/products')));
   
 
     // Function to convert all ids of items to products 
@@ -27,7 +29,7 @@ async function startTheServer() {
     }
 
     // Loading list of products
-    app.get('/products', async (req, res) => {
+    app.get('/api/products', async (req, res) => {
         // Connect to the client 
 
         const products = await db.collection('products').find({}).toArray();
@@ -35,7 +37,7 @@ async function startTheServer() {
     })
 
     // Loading user's current shopping cart
-    app.get('/users/:userId/cart', async (req, res) => {
+    app.get('/api/users/:userId/cart', async (req, res) => {
         // Get the users from db
         const user = await db.collection('users').findOne({ id: req.params.userId });
         const populatedCart = await populatedCartIds(user.cartItems);
@@ -43,7 +45,7 @@ async function startTheServer() {
     })
 
     // Loading list of products
-    app.get('/products/:productId', async (req, res) => {
+    app.get('/api/products/:productId', async (req, res) => {
         // Connecting the db and select the db
         const productId = req.params.productId;
         const product = await db.collection('products').findOne({ id: productId });
@@ -52,7 +54,7 @@ async function startTheServer() {
     })
 
     // Add an item to shopping cart
-    app.post('/users/:userId/cart', async (req, res) => {
+    app.post('/api/users/:userId/cart', async (req, res) => {
         const userId = req.params.userId;
 
         // use userId to load and update their cartItems property
@@ -72,7 +74,7 @@ async function startTheServer() {
     })
 
     // Remove item from cart 
-    app.delete('/users/:userId/cart/:productId', async (req, res) => {
+    app.delete('/api/users/:userId/cart/:productId', async (req, res) => {
 
         const userId = req.params.userId;
 
