@@ -194,10 +194,17 @@
     height: 100px;
     max-width: 100px;
   }
+
+  .product-amount {
+    flex: 1;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+  }
   
   .details-wrap {
     padding: 0 16px;
-    flex: 3;
+    flex: 2;
   }
   
   .remove-button {
