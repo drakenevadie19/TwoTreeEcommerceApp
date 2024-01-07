@@ -52,26 +52,39 @@ async function startTheServer() {
     })
 
     // Add an item to shopping cart
-    app.post('/cart', (req, res) => {
+    app.post('/users/:userId/cart', async (req, res) => {
+        const userId = req.params.userId;
+
+        // use userId to load and update their cartItems property
         // In this POST request, we have add item's id to request body => We can get that id 
         const productId = req.body.id;
         // Find that product
         //  const product = productItem.find(product => product.id === productId);
         // Once we found that product, insert it to cart
-        cartItem.push(productId);
+        await db.collection('users').updateOne({ id: userId }, {
+            $push: { cartItems: productId }
+        })
         
         // An array of products corresponding to current shopping cart 
-        const populatedCart = populatedCartIds(cartItem);
+        const user = await db.collection('users').findOne({ id: req.params.userId });
+        const populatedCart = await populatedCartIds(user.cartItems);
         res.json(populatedCart);
     })
 
     // Remove item from cart 
-    app.delete('/cart/:productId', (req, res) => {
+    app.delete('/users/:userId/cart/:productId', async (req, res) => {
+
+        const userId = req.params.userId;
+
         const productId = req.params.productId;
-        // Since we have id of item to remove, we will filter out all ids in cartItem match productId
-        //  => cartItem array only contain ids that does not match productId
-        cartItem = cartItem.filter(cartitemId => cartitemId !== productId);
-        const populatedCart = populatedCartIds(cartItem);
+
+        await db.collection('users').updateOne({ id: userId }, {
+            $pull: { cartItems: productId }
+        })
+
+        // An array of products corresponding to current shopping cart 
+        const user = await db.collection('users').findOne({ id: userId });
+        const populatedCart = await populatedCartIds(user.cartItems);
         res.json(populatedCart);
     })
 
