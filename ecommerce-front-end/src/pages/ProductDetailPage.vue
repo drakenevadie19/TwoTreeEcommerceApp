@@ -9,7 +9,8 @@
             <h3 class="price">{{ product.price }}</h3>
 
             <!-- Button to allow user to add item into shopping cart -->
-            <button @click="addToCart" class="add-to-cart">Add to Cart</button>
+            <button @click="addToCart" class="add-to-cart" v-if="!itemIsInCart">Add to cart</button>
+            <button class="grey-button" v-if="itemIsInCart">Item is already in cart</button>
         </div>
     </div>
 
@@ -28,6 +29,12 @@
         data() {
             return {
                 product: {}, 
+                cartItems: [],
+            }
+        },
+        computed: {
+            itemIsInCart() {
+            return this.cartItems.some(item => item.id === this.$route.params.productId);
             }
         },
         methods: {
@@ -43,6 +50,10 @@
             const response = await axios.get(`/api/products/${this.$route.params.productId}`);
             const product = response.data;
             this.product = product;
+
+            const cartResponse = await axios.get('/api/users/12345/cart');
+            const cartItems = cartResponse.data;
+            this.cartItems = cartItems;
         }
     }
 </script>
