@@ -6,9 +6,14 @@
             </div>
         </router-link>
 
-        <router-link to="/cart" class="cart-link">
-            <button>Shopping Cart</button>
-        </router-link>
+        <div class="nav-buttons-wrap">
+            <button @click="signOutNow" v-if="user">Log Out</button>
+            <router-link to="/cart">
+                <button>Shopping Cart</button>
+            </router-link>
+        </div>
+
+        
     </div>
 </template>
 
@@ -16,11 +21,20 @@
     //@ = ..
     import logo from '../assets/products/logo-hexagon.svg';
 
+    import { getAuth, signOut } from 'firebase/auth';
+
     export default {
         name: "NavBar",
         data() {
             return {
                 logo,
+            }
+        }, 
+        props: ['user'],
+        methods: {
+            signOutNow() {
+                const auth = getAuth();
+                signOut(auth);
             }
         }
     }

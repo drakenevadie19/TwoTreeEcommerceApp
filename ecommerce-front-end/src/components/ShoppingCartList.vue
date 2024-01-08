@@ -15,7 +15,7 @@
         </div>
     </div>
     <div v-if="cartList.length === 0">
-        Your cart is currently empty
+        <h1> Your cart is empty now!</h1>
     </div>
 </template>
 

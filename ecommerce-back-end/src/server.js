@@ -40,7 +40,7 @@ async function startTheServer() {
     app.get('/api/users/:userId/cart', async (req, res) => {
         // Get the users from db
         const user = await db.collection('users').findOne({ id: req.params.userId });
-        const populatedCart = await populatedCartIds(user.cartItems);
+        const populatedCart = await populatedCartIds(user?.cartItems || []);
         res.json(populatedCart);
     })
 
@@ -60,16 +60,21 @@ async function startTheServer() {
         // use userId to load and update their cartItems property
         // In this POST request, we have add item's id to request body => We can get that id 
         const productId = req.body.id;
-        // Find that product
-        //  const product = productItem.find(product => product.id === productId);
-        // Once we found that product, insert it to cart
+
+        const existingUser = await db.collection('users').findOne({ id: userId });
+        // If the user does not exist, we will insert a new user with an enpty shopping cart
+        if (!existingUser) {
+            await db.collection('users').insertOne({ id: userId, cartItems: [] });
+        }
+
+        // Otherwise, it will update the user's shopping cart 
         await db.collection('users').updateOne({ id: userId }, {
             $push: { cartItems: productId }
         })
         
         // An array of products corresponding to current shopping cart 
         const user = await db.collection('users').findOne({ id: req.params.userId });
-        const populatedCart = await populatedCartIds(user.cartItems);
+        const populatedCart = await populatedCartIds(user?.cartItems || []);
         res.json(populatedCart);
     })
 
@@ -86,7 +91,7 @@ async function startTheServer() {
 
         // An array of products corresponding to current shopping cart 
         const user = await db.collection('users').findOne({ id: userId });
-        const populatedCart = await populatedCartIds(user.cartItems);
+        const populatedCart = await populatedCartIds(user?.cartItems || []);
         res.json(populatedCart);
     })
 
