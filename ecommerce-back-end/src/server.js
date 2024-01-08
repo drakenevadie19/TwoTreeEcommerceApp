@@ -1,17 +1,16 @@
 import express from 'express';
 
-import { cartItems as cartItemsRaw, products as productsRaw, } from './temp-data';
-
-import { MongoClient } from 'mongodb';
-
+import 'dotenv/config';
 import path from 'path';
 
+import { db, connectToDB } from './db.js';
+
 async function startTheServer() {
-    const client = new MongoClient(url);
+    
 
     // Connect to the db and select the db 
-    await client.connect();
-    const db = client.db('ecomnerce-app');
+    // await client.connect();
+    // const db = client.db('ecomnerce-app');
     
     // FROM NOW ON, WE CAN USE db variable FOR database querries
 
@@ -96,8 +95,16 @@ async function startTheServer() {
     })
 
     // Server listen to request
-    app.listen(8000, () => {
-        console.log('Server is listening on port 8000');
+    // app.listen(8000, () => {
+    //     console.log('Server is listening on port 8000');
+    // })
+    const PORT = process.env.PORT || 8000;
+
+    connectToDB(() => {
+        console.log('Successfully connected to database!');
+        app.listen(PORT, () => {
+            console.log('Server is listening on port ' + PORT);
+        });
     })
 }
 
