@@ -20,6 +20,10 @@ async function startTheServer() {
     //Server will serve static files from Assests folder
     app.use('/images', express.static(path.join(__dirname, '../assets/products')));
   
+    app.use(express.static(
+        path.resolve(__dirname, '../dist'),
+        { maxAge: '1y', etag: false },
+    ))
 
     // Function to convert all ids of items to products 
     //  => if we assign this function to a variable, we can get an array/list of products
@@ -92,6 +96,10 @@ async function startTheServer() {
         const user = await db.collection('users').findOne({ id: userId });
         const populatedCart = await populatedCartIds(user?.cartItems || []);
         res.json(populatedCart);
+    });
+
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../dist/index.html'));
     })
 
     // Server listen to request
