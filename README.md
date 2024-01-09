@@ -1,0 +1,8 @@
+- Techstack:
+  - Programming Language: JavaScript
+  - Front-end: Vue.js
+  - Back-End: Node.js, Express.js
+  - Database: MongoDB, Mongo Atlas Database hosting
+  - API: Restful API, Postman
+  - Connecting Front-end and Back-end: Axios
+  - Web hosting: Render
