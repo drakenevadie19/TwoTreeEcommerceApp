@@ -1,3 +1,8 @@
+- Responsibility:
+  - Architecture a responsive user-friendly shopping interface for an unreal Two Tree Restaurant.
+  - Design a backend using Node.js and Express.js to deliver CRUD activity on a MongoDB database, hosted on MongoDB Atlas Interface, to  purchase items.
+  - Managed users' account actions such as signing in, signing out, and states using Firebase Authentication.
+
 - Techstack:
   - Programming Language: JavaScript
   - Front-end: Vue.js
